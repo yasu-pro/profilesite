@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+@use '../setting' as *;
+@use '../mixin' as *;
+
+html {
+	font-family: $Gothic;
+}
+body {
+	min-width: 1080px;
+	// min-width: 1200px;
+	color: $textColor;
+	@include fz($baseFont);
+	font-weight: $baseWeight;
+	line-height: $lineHeight;
+	@include bpTb {
+		@include fz($baseFontSp);
+		min-width: auto;
+	}
+}
+a {
+	background-color: transparent;
+	text-decoration: none;
+	color: inherit;
+}
+img {
+	max-width: 100%;
+	height: auto;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+	&:focus {
+		outline: -webkit-focus-ring-color auto 1px;
+		outline-color: -webkit-focus-ring-color;
+		outline-style: auto;
+		outline-width: 1px;
+	}
+}
+small {
+	font-size: inherit;
+}

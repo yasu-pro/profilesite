@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHvxk.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Shippori Mincho B1';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/shipporiminchob1/v21/wXK2E2wCr44tulPdnn-xbIpJ9RgT9-nyjg.ttf) format('truetype');
+}

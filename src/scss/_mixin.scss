@@ -1,0 +1,46 @@
+@charset "UTF-8";
+
+@use 'sass:math';
+@use './setting' as *;
+
+@mixin fz($size: $baseFont) {
+	font-size: $size + px;
+	font-size: math.div($size, 16) + rem;
+}
+
+@mixin wrapper($width: $bpPcs) {
+	max-width: $width;
+	margin-left: auto;
+	margin-right: auto;
+	@include breakpoint($baseWidth) {
+		max-width: $baseWidthSp;
+	}
+}
+
+@mixin breakpoint($width: $bpSp) {
+	@media screen and (max-width: $width) {
+		@content;
+	}
+}
+
+@mixin bpTb {
+	@media screen and (max-width: $bpTb) {
+		@content;
+	}
+}
+
+@mixin bpSp {
+	@media screen and (max-width: $bpSp) {
+		@content;
+	}
+}
+
+@mixin bpSps {
+	@media screen and (max-width: $bpSps) {
+		@content;
+	}
+}
+
+@mixin line-h($fontsize, $lin) {
+	line-height: $lin / $fontsize;
+}

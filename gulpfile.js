@@ -3,11 +3,20 @@ import ejs from 'gulp-ejs';
 import rename from 'gulp-rename';
 import dartSass from 'gulp-dart-sass';
 import autoprefixer from 'gulp-autoprefixer';
+import imagemin from 'gulp-imagemin';
+import mozjpeg from 'imagemin-mozjpeg';
+import pngquant from 'imagemin-pngquant';
+import gulpif from 'gulp-if';
 import plumber from 'gulp-plumber';
 import notify from 'gulp-notify';
 import uglify from 'gulp-uglify';
 import browserSync from 'browser-sync';
+import download from 'gulp-download';
+import ttf2woff2 from 'gulp-ttf2woff2';
 import fs from 'fs';
+import { deleteSync } from 'del';
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const { series, parallel, watch, src, dest } = gulp;
 const { reload } = browserSync;
@@ -15,14 +24,10 @@ const { reload } = browserSync;
 const createResetCSSFile = () => {
 	fs.writeFileSync(
 		'./src/scss/base/_reset.scss',
-		fs.readFileSync('./node_modules/reset-css/reset.css'),
+		fs.readFileSync('./node_modules/destyle.css/destyle.css'),
 	);
 	return Promise.resolve();
 };
-
-// const resetCSSFile = () => {
-// 	return src('./src/scss/_reset.scss').pipe(dest('./dest/css'));
-// };
 
 const copyHtml = () => {
 	return src('./src/html/**/*.html').pipe(dest('./dest'));
@@ -49,15 +54,93 @@ const compileSass = () => {
 		.pipe(
 			autoprefixer({
 				cascade: false,
+				grid: 'autoplace',
 			}),
 		)
 		.pipe(dest('./dest/css', { sourcemaps: '.' }));
 };
 
 const minifyJs = () => {
-	return src('./src/js/*.js', { sourcemaps: true })
+	return src('./src/js/**/*.js', { sourcemaps: true })
 		.pipe(uglify())
 		.pipe(dest('./dest/js', { sourcemaps: '.' }));
+};
+
+const deleteFiles = async () => {
+	try {
+		// Use del to remove files based on glob pattern, with force option
+		await deleteSync(['./dest/css/**/*.css.map', './dest/js/**/*.js.map'], {
+			force: true,
+		});
+		console.log('All files deleted successfully');
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+/*========================
+// 画像
+========================*/
+const imageTask = () => {
+	return gulp
+		.src('./src/img/**/*.{png,jpg}', { base: './src' })
+		.pipe(
+			gulpif(
+				!isDevelopment,
+				imagemin([mozjpeg({ quality: 90 }), pngquant({ quality: [0.8, 0.9] })]),
+			),
+		)
+		.pipe(gulp.dest('./dest'))
+		.pipe(reload({ stream: true }));
+};
+
+/*========================
+// Google fonts ダウンロード
+========================*/
+const downloadFonts = () => {
+	// ダウンロードするWebフォントのURLを指定
+	const fontUrl =
+		'https://fonts.googleapis.com/css2?family=Lato&family=Shippori+Mincho+B1&display=swap';
+
+	// ダウンロードして`src/fonts`に保存
+	return download(fontUrl)
+		.pipe(rename('fonts.css'))
+		.pipe(gulp.dest('./src/fonts'));
+};
+
+const convertFonts = () => {
+	// `src/fonts`からTTFフォントを取得し、WOFF2に変換して`dest/fonts`に保存
+	return gulp
+		.src('./src/fonts/*.ttf')
+		.pipe(ttf2woff2())
+		.pipe(gulp.dest('./dest/fonts'));
+};
+
+const convertAndEmbedFonts = () => {
+	// `src/fonts`からTTFフォントを取得し、Base64エンコードしてCSSに埋め込む
+	const fonts = fs.readFileSync('./src/fonts/fonts.css', 'utf8');
+	const regex = /url\('(.*?)'\)/g;
+	let match;
+	let promises = [];
+
+	while ((match = regex.exec(fonts))) {
+		const fontPath = match[1];
+		const fontName = fontPath.match(/\/([^\/?#]+)[^\/]*$/)[1];
+
+		promises.push(
+			new Promise((resolve) => {
+				fs.readFile(`./src/fonts/${fontName}`, (err, data) => {
+					if (err) throw err;
+					const base64Data = data.toString('base64');
+					fs.writeFile(`./src/fonts/${fontName}.txt`, base64Data, () => {
+						resolve();
+					});
+				});
+			}),
+		);
+	}
+
+	return Promise.all(promises);
 };
 
 const watchFiles = () => {
@@ -69,7 +152,7 @@ const watchFiles = () => {
 		'change',
 		reload,
 	);
-	watch('./src/js/*.js', { ignoreInitial: false }, minifyJs).on(
+	watch('./src/js/**/*.js', { ignoreInitial: false }, minifyJs).on(
 		'change',
 		reload,
 	);
@@ -77,6 +160,11 @@ const watchFiles = () => {
 		'change',
 		reload,
 	);
+	watch(
+		'./src/img/**/*.{png,jpg}',
+		{ events: ['add', 'change'], ignoreInitial: false },
+		imageTask,
+	).on('change', reload);
 
 	browserSync.init({
 		server: {
@@ -85,39 +173,21 @@ const watchFiles = () => {
 	});
 };
 
-const deleteFiles = async (cb) => {
-	const filesToDelete = ['./dest/css/style.css.map', './dest/js/script.js.map'];
-
-	let deletedCount = 0;
-
-	filesToDelete.forEach((filePath) => {
-		fs.unlink(filePath, (err) => {
-			if (err) {
-				console.error(err);
-			} else {
-				console.log(`Deleted file: ${filePath}`);
-				deletedCount++;
-				if (deletedCount === filesToDelete.length) {
-					console.log('All files deleted successfully');
-					cb();
-				}
-			}
-		});
-	});
-};
-
 // 開発用のタスク
 export const dev = series(
 	createResetCSSFile,
-	parallel(compileEjs, compileSass),
+	parallel(
+		compileEjs,
+		compileSass,
+		downloadFonts,
+		convertFonts,
+		convertAndEmbedFonts,
+		imageTask,
+	),
 	watchFiles,
 );
 
 // ビルド用のタスク
-export const build = series(
-	createResetCSSFile,
-	deleteFiles,
-	parallel(compileEjs, compileSass, minifyJs),
-);
+export const build = series(parallel(minifyJs), deleteFiles);
 
 export default dev;
