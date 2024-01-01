@@ -14,9 +14,13 @@ import browserSync from 'browser-sync';
 import download from 'gulp-download';
 import ttf2woff2 from 'gulp-ttf2woff2';
 import fs from 'fs';
+import changed from 'gulp-changed';
 import { deleteSync } from 'del';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
+// Font指定
+const fontUrl =
+	'https://fonts.googleapis.com/css2?family=Lato&family=Shippori+Mincho+B1&display=swap';
 
 const { series, parallel, watch, src, dest } = gulp;
 const { reload } = browserSync;
@@ -38,6 +42,7 @@ const compileEjs = () => {
 		.pipe(
 			plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }),
 		)
+		.pipe(changed('./dest', { extension: '.html' }))
 		.pipe(ejs())
 		.pipe(rename({ extname: '.html' }))
 		.pipe(dest('./dest'));
@@ -48,6 +53,7 @@ const compileSass = () => {
 		.pipe(
 			plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }),
 		)
+		.pipe(changed('./dest/css', { extension: '.css' }))
 		.pipe(
 			dartSass.sync({ outputStyle: 'compressed' }).on('error', dartSass.logError),
 		)
@@ -63,12 +69,15 @@ const compileSass = () => {
 const minifyJs = () => {
 	return src('./src/js/**/*.js', { sourcemaps: true })
 		.pipe(uglify())
+		.pipe(gulp.dest('./dest/js'))
 		.pipe(dest('./dest/js', { sourcemaps: '.' }));
 };
 
+/*========================
+// build時 mapファイル 削除
+========================*/
 const deleteFiles = async () => {
 	try {
-		// Use del to remove files based on glob pattern, with force option
 		await deleteSync(['./dest/css/**/*.css.map', './dest/js/**/*.js.map'], {
 			force: true,
 		});
@@ -82,26 +91,24 @@ const deleteFiles = async () => {
 // 画像
 ========================*/
 const imageTask = () => {
-	return gulp
-		.src('./src/img/**/*.{png,jpg}', { base: './src' })
-		.pipe(
-			gulpif(
-				!isDevelopment,
-				imagemin([mozjpeg({ quality: 90 }), pngquant({ quality: [0.8, 0.9] })]),
-			),
-		)
-		.pipe(gulp.dest('./dest'))
-		.pipe(reload({ stream: true }));
+	return (
+		gulp
+			.src('./src/img/**/*.{png,jpg}', { base: './src' })
+			// .pipe(
+			// 	gulpif(
+			// 		!isDevelopment,
+			// 		imagemin([mozjpeg({ quality: 80 }), pngquant({ quality: [0.8, 0.9] })]),
+			// 	),
+			// )
+			.pipe(gulp.dest('./dest'))
+			.pipe(reload({ stream: true }))
+	);
 };
 
 /*========================
 // Google fonts ダウンロード
 ========================*/
 const downloadFonts = () => {
-	// ダウンロードするWebフォントのURLを指定
-	const fontUrl =
-		'https://fonts.googleapis.com/css2?family=Lato&family=Shippori+Mincho+B1&display=swap';
-
 	// ダウンロードして`src/fonts`に保存
 	return download(fontUrl)
 		.pipe(rename('fonts.css'))
@@ -143,6 +150,9 @@ const convertAndEmbedFonts = () => {
 	return Promise.all(promises);
 };
 
+/*========================
+// Watch
+========================*/
 const watchFiles = () => {
 	watch('./src/ejs/**/*.ejs', { ignoreInitial: false }, compileEjs).on(
 		'change',
