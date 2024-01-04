@@ -2,7 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
 		<meta name="keyword" content="" />
 		<meta name="description" content="" />
 		<meta name="format-detection" content="telephone=no" />
@@ -28,26 +31,87 @@
 	</head>
 	<body>
 		<header class="l-header">
-			<h1>
-				<div class="header-logo">
-					<img
-						src="../img/sample_1.jpg"
-						alt=""
-						srcset=""
-						width="5184"
-						height="3296"
-					/>
-				</div>
-				<a href="">
-					<span>header</span>
-				</a>
-			</h1>
+			<div class="header">
+				<h1 class="header_logo">
+					<a class="header_logo-title" href="">
+						<span>Profile</span>
+					</a>
+				</h1>
 
-			<div class="hamburger"></div>
+				<nav class="header_nav">
+					<ul>
+						<li><a href="#">About</a></li>
+						<li><a href="#">Bicycle</a></li>
+					</ul>
+				</nav>
+			</div>
 		</header>
 
-		<main class="l-main"></main>
+		<main class="l-main">
+			<section class="mainvisual">
+				<img src="../img/sample_1.jpg" alt="" />
+			</section>
 
-		<footer class="l-footer"></footer>
+			<section class="about">
+				<div class="wrapper">
+					<h2 class="m-title">
+						<span>About</span>
+					</h2>
+
+					<div class="about_card">
+						<div class="about_card-img">
+							<img src="../img/about_human_01.jpg" alt="" width="100" height="100" />
+						</div>
+
+						<div class="about_card-text">
+							<p class="title">KAKERU MIYAICHI</p>
+							<p class="text">
+								テキストテキストテキストテキストテキストテキストテキスト
+								テキストテキストテキストテキストテキストテキストテキスト
+								テキストテキストテキストテキストテキストテキストテキスト
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="bicycle">
+				<div class="wrapper">
+					<h2 class="m-title">
+						<span>Bicycle</span>
+					</h2>
+
+					<div class="bicycle_card">
+						<ul>
+							<li>
+								<div class="thumbnail">
+									<img src="../img/bicycle_card_01.jpg" alt="" />
+								</div>
+								<h3 class="title">タイトル</h3>
+								<p class="text">テキストテキストテキスト</p>
+							</li>
+							<li>
+								<div class="thumbnail">
+									<img src="../img/bicycle_card_02.jpg" alt="" />
+								</div>
+								<h3 class="title">タイトル</h3>
+								<p class="text">テキストテキストテキスト</p>
+							</li>
+							<li>
+								<div class="thumbnail">
+									<img src="../img/bicycle_card_03.jpg" alt="" />
+								</div>
+								<h3 class="title">タイトル</h3>
+								<p class="text">テキストテキストテキスト</p>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="l-footer">
+			<p><small>© 2020 Profile</small></p>
+		</footer>
 	</body>
 </html>

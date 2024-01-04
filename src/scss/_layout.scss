@@ -4,10 +4,59 @@
 @use './mixin' as *;
 
 .l-header {
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-left: 230px;
+		padding-right: 232px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		height: 60px;
+
+		@include bpTb {
+			padding-right: 12px;
+			padding-left: 10px;
+		}
+		&_logo {
+			display: inline-block;
+			&-title {
+				padding: 10px 21.8px;
+				width: 120px;
+				height: 40px;
+				color: #fff;
+				background-color: #393e46;
+				background-repeat: no-repeat;
+				opacity: 1;
+			}
+		}
+		&_nav {
+			ul {
+				display: flex;
+				gap: 33px;
+				li {
+					@include fz(14.4);
+					@include line-h(14.4, 17);
+					font-family: $Gothic;
+					color: $textColor;
+					text-align: left;
+				}
+			}
+		}
+	}
 }
 
 .l-main {
 }
 
 .l-footer {
+	text-align: center;
+	margin-top: 117px;
+	margin-bottom: 12px;
+	small {
+		@include fz(10);
+		color: $textColor;
+		font-family: $Gothic;
+		@include line-h(10, 12);
+	}
 }

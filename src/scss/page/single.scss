@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+@use '../setting' as *;
+@use '../mixin' as *;
+
+.wrapper {
+	@include wrapper(840px);
+}
+
+.single {
+	.thumbnail {
+		// width: 100%;
+		img {
+			width: 100%;
+			height: 480px;
+			object-fit: cover;
+			@include bpTb {
+				width: 100%;
+				height: 197px;
+			}
+		}
+	}
+
+	.content {
+		padding: 34px 34px 0;
+		@include bpTb {
+			padding: 34px 0 0;
+		}
+		.title {
+			@include fz(21.6);
+			font-weight: bold;
+			font-family: $Gothic;
+			color: $textColor;
+			@include line-h(21.6, 21.6);
+		}
+		.text {
+			margin-top: 39px;
+			@include fz(14.4);
+			font-family: $Gothic;
+			color: $textColor;
+			@include line-h(14.4, 24.48);
+		}
+	}
+	.buttonWrap {
+		text-align: center;
+		margin-top: 66px;
+
+		.button {
+			@include fz(14.4);
+			font-family: $Gothic;
+			color: $textColor;
+			@include line-h(14.4, 24.48);
+		}
+	}
+}

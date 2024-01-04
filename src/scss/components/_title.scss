@@ -1,0 +1,29 @@
+@charset "UTF-8";
+
+@use '../mixin' as *;
+@use '../setting' as *;
+
+.m-title {
+	text-align: center;
+
+	span {
+		position: relative;
+		@include fz(32);
+		font-family: $Gothic;
+		font-weight: bold;
+		color: $textColor;
+		@include line-h(32, 38);
+		letter-spacing: 0;
+
+		&::before {
+			content: '';
+			display: inline-block;
+			position: absolute;
+			bottom: -7px;
+			left: 0;
+			width: 100%;
+			height: 1px;
+			border-top: 1px solid $textColor;
+		}
+	}
+}

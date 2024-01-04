@@ -12,8 +12,10 @@
 	max-width: $width;
 	margin-left: auto;
 	margin-right: auto;
-	@include breakpoint($baseWidth) {
-		max-width: $baseWidthSp;
+	@include breakpoint($bpTb) {
+		// max-width: $bpTb;
+		margin-left: 15px;
+		margin-right: 15px;
 	}
 }
 
@@ -42,5 +44,5 @@
 }
 
 @mixin line-h($fontsize, $lin) {
-	line-height: $lin / $fontsize;
+	line-height: calc($lin / $fontsize);
 }
